@@ -29,3 +29,8 @@
 
 en:
   hello: "Hello world"
+
+
+  accounts:
+    new:
+      title: "Create an account"
