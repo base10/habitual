@@ -4,19 +4,22 @@ class AccountsController < ApplicationController
   end
 
   def create
-    @user = User.new(permitted_params)
+    @user = User.new(permitted_create_params)
 
     respond_to do |format|
       if @user.save
+        flash[:notice] = "Welcome, #{@user.name}. Your account has been created."
+
         format.html {
-          qrender :new,
-          notice: "Account created.",
+          render :new,
           status: :created
         }
       else
+        Rails.logger.debug { "<<< #{@user.errors.first} " }
+        flash[:alert] = @user.errors.first.message
+
         format.html {
           render :new,
-          alert: @user.errors.first.message,
           status: :unprocessable_entity
         }
       end
@@ -25,7 +28,7 @@ class AccountsController < ApplicationController
 
   private
 
-  def permitted_params
+  def permitted_create_params
     params.require(
       :user
     ).permit(
@@ -33,6 +36,15 @@ class AccountsController < ApplicationController
       :name,
       :password,
       :password_confirmation
+    )
+  end
+
+  def permitted_update_params
+    params.require(
+      :user
+    ).permit(
+      :email,
+      :password,
     ).with_defaults(password_challenge: '')
   end
 end
